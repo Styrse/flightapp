@@ -24,8 +24,9 @@ public class FlightReader {
             //List<FlightInfoDTO> flightInfoDTOList = getFlightInfoDetails(flightList);
             //flightInfoDTOList.forEach(System.out::println);
             //System.out.println(getAvgFlightTimeForAirline("Air Explore"));
-            System.out.println(getMinFlightTimeForAirline("Jet Linx Aviation"));
-            System.out.println(getMaxFlightTimeForAirline("Nordwind Airlines"));
+            //System.out.println(getMinFlightTimeForAirline("Jet Linx Aviation"));
+            //System.out.println(getMaxFlightTimeForAirline("Nordwind Airlines"));
+            System.out.println(getAverageFlightTimeBetweenAirports("Pulkovo", "Kurumoch"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -107,5 +108,20 @@ public class FlightReader {
                 .getAsDouble();
 
         return maxFlightTime;
+    }
+
+    public static double getAverageFlightTimeBetweenAirports(String airportA, String airportB) throws IOException {
+        List<FlightDTO> flightList = FlightReader.getFlightsFromFile("flights json");
+        List<FlightInfoDTO> flightInfoDTOList = FlightReader.getFlightInfoDetails(flightList);
+
+        double avgFlightTime = flightInfoDTOList.stream()
+                .filter(flight -> flight.getOrigin() != null)
+                .filter(flight -> flight.getOrigin().equals(airportA))
+                .filter(flight -> flight.getDestination().equals(airportB))
+                .mapToDouble(flight -> flight.getDuration().toMinutes())
+                .average()
+                .getAsDouble();
+
+        return avgFlightTime;
     }
 }
