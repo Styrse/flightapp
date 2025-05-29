@@ -23,7 +23,9 @@ public class FlightReader {
             //List<FlightDTO> flightList = getFlightsFromFile("flights.json");
             //List<FlightInfoDTO> flightInfoDTOList = getFlightInfoDetails(flightList);
             //flightInfoDTOList.forEach(System.out::println);
-            System.out.println(getAvgFlightTimeForAirline("Air Explore"));
+            //System.out.println(getAvgFlightTimeForAirline("Air Explore"));
+            System.out.println(getMinFlightTimeForAirline("Jet Linx Aviation"));
+            System.out.println(getMaxFlightTimeForAirline("Nordwind Airlines"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,5 +79,33 @@ public class FlightReader {
                 .getAsDouble();
 
         return avgTime;
+    }
+
+    public static double getMinFlightTimeForAirline(String airlineName) throws IOException {
+        List<FlightDTO> flightList = FlightReader.getFlightsFromFile("flights json");
+        List<FlightInfoDTO> flightInfoDTOList = FlightReader.getFlightInfoDetails(flightList);
+
+        double minFlightTime = flightInfoDTOList.stream()
+                .filter(flight -> flight.getAirline() != null)
+                .filter(flight -> flight.getAirline().equals(airlineName))
+                .mapToDouble(flight -> flight.getDuration().toMinutes())
+                .min()
+                .getAsDouble();
+
+        return minFlightTime;
+    }
+
+    public static double getMaxFlightTimeForAirline(String airlineName) throws IOException {
+        List<FlightDTO> flightList = FlightReader.getFlightsFromFile("flights json");
+        List<FlightInfoDTO> flightInfoDTOList = FlightReader.getFlightInfoDetails(flightList);
+
+        double maxFlightTime = flightInfoDTOList.stream()
+                .filter(flight -> flight.getAirline() != null)
+                .filter(flight -> flight.getAirline().equals(airlineName))
+                .mapToDouble(flight -> flight.getDuration().toMinutes())
+                .max()
+                .getAsDouble();
+
+        return maxFlightTime;
     }
 }
