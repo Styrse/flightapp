@@ -20,9 +20,10 @@ public class FlightReader {
 
     public static void main(String[] args) {
         try {
-            List<FlightDTO> flightList = getFlightsFromFile("flights.json");
-            List<FlightInfoDTO> flightInfoDTOList = getFlightInfoDetails(flightList);
-            flightInfoDTOList.forEach(System.out::println);
+            //List<FlightDTO> flightList = getFlightsFromFile("flights.json");
+            //List<FlightInfoDTO> flightInfoDTOList = getFlightInfoDetails(flightList);
+            //flightInfoDTOList.forEach(System.out::println);
+            System.out.println(getAvgFlightTimeForAirline("Air Explore"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,4 +65,17 @@ public class FlightReader {
         return flightInfoList;
     }
 
+    public static double getAvgFlightTimeForAirline(String airlineName) throws IOException {
+        List<FlightDTO> flightList = FlightReader.getFlightsFromFile("flights json");
+        List<FlightInfoDTO> flightInfoDTOList = FlightReader.getFlightInfoDetails(flightList);
+
+        double avgTime = flightInfoDTOList.stream()
+                .filter(flight -> flight.getAirline() != null)
+                .filter(flight -> flight.getAirline().equals(airlineName))
+                .mapToDouble(flight -> flight.getDuration().toMinutes())
+                .average()
+                .getAsDouble();
+
+        return avgTime;
+    }
 }
