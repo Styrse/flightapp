@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Purpose:
@@ -26,7 +27,10 @@ public class FlightReader {
             //System.out.println(getAvgFlightTimeForAirline("Air Explore"));
             //System.out.println(getMinFlightTimeForAirline("Jet Linx Aviation"));
             //System.out.println(getMaxFlightTimeForAirline("Nordwind Airlines"));
-            System.out.println(getAverageFlightTimeBetweenAirports("Pulkovo", "Kurumoch"));
+            //System.out.println(getAverageFlightTimeBetweenAirports("Pulkovo", "Kurumoch"));
+            for (String fastestAirlineBetweenTwoAirport : getFastestAirlineBetweenTwoAirports("Pulkova", "Kurumoch")) {
+                System.out.println(fastestAirlineBetweenTwoAirport);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -123,5 +127,28 @@ public class FlightReader {
                 .getAsDouble();
 
         return avgFlightTime;
+    }
+
+    public static String[] getFastestAirlineBetweenTwoAirports(String airportA, String airportB) throws IOException {
+        List<FlightDTO> flightList = FlightReader.getFlightsFromFile("flights json");
+        List<FlightInfoDTO> flightInfoDTOList = FlightReader.getFlightInfoDetails(flightList);
+
+        double shortestTime = flightInfoDTOList.stream()
+                .filter(flight -> flight.getOrigin() != null)
+                .filter(flight -> flight.getOrigin().equals(airportA))
+                .filter(flight -> flight.getDestination().equals(airportB))
+                .mapToDouble(flight -> flight.getDuration().toMinutes())
+                .min()
+                .getAsDouble();
+
+        String[] fastestAirlines = flightInfoDTOList.stream()
+                .filter(flight -> flight.getOrigin().equals(airportA))
+                .filter(flight -> flight.getDestination().equals(airportB))
+                .filter(flight -> flight.getDuration().toMinutes() == (long) shortestTime)
+                .map(FlightInfoDTO::getAirline)
+                .distinct()
+                .toArray(String[]::new);
+
+        return fastestAirlines;
     }
 }
